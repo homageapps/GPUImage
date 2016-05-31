@@ -3,6 +3,14 @@
 #import "GPUImageFilter.h"
 #import "GPUImageVideoCamera.h"
 
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+//
+// Issues to resolve:
+//
+//   1) memory consumption goes up when using a blend filter with a GPUImageMovie used as one of the inputs.
+//
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
 @interface GPUImageMovie () <AVPlayerItemOutputPullDelegate>
 {
     BOOL audioEncodingIsFinished, videoEncodingIsFinished;
