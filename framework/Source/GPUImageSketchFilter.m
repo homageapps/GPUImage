@@ -26,6 +26,7 @@ NSString *const kGPUImageSketchFragmentShaderString = SHADER_STRING
  
  void main()
  {
+     
      float bottomLeftIntensity = texture2D(inputImageTexture, bottomLeftTextureCoordinate).r;
      float topRightIntensity = texture2D(inputImageTexture, topRightTextureCoordinate).r;
      float topLeftIntensity = texture2D(inputImageTexture, topLeftTextureCoordinate).r;
