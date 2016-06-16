@@ -31,6 +31,8 @@
     const GLfloat *_preferredConversion;
     
     BOOL isFullYUVRange;
+    
+    BOOL isFirstFrame;
 
     int imageBufferWidth, imageBufferHeight;
 }
@@ -161,6 +163,7 @@
 
 - (void)startProcessing
 {
+    isFirstFrame = YES;
     if( self.playerItem ) {
         [self processPlayerItem];
         return;
@@ -233,6 +236,8 @@
 
     return assetReader;
 }
+
+
 
 - (void)processAsset
 {
@@ -371,14 +376,13 @@
                 
                 CGFloat frameTimeDifference = CMTimeGetSeconds(differenceFromLastFrame);
                 CGFloat actualTimeDifference = currentActualTime - previousActualFrameTime;
-                
-                if (frameTimeDifference > actualTimeDifference)
+                if (frameTimeDifference > actualTimeDifference && !isFirstFrame)
                 {
                     usleep(1000000.0 * (frameTimeDifference - actualTimeDifference));
                 }
-                
                 previousFrameTime = currentSampleTime;
                 previousActualFrameTime = CFAbsoluteTimeGetCurrent();
+                isFirstFrame = NO;
             }
 
             __unsafe_unretained GPUImageMovie *weakSelf = self;

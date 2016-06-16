@@ -666,6 +666,8 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 - (void)newFrameReadyAtTime:(CMTime)frameTime atIndex:(NSInteger)textureIndex;
 {
+    NSLog(@">>> %@ %@ %@", @(isRecording), @(frameTime.timescale), @(frameTime.value));
+    
     if (!isRecording)
     {
         [firstInputFramebuffer unlock];

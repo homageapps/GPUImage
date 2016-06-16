@@ -12,6 +12,7 @@ NSString *const kGPUImageThreeInputTextureVertexShaderString = SHADER_STRING
  varying vec2 textureCoordinate2;
  varying vec2 textureCoordinate3;
  
+ 
  void main()
  {
      gl_Position = position;
@@ -21,9 +22,14 @@ NSString *const kGPUImageThreeInputTextureVertexShaderString = SHADER_STRING
  }
 );
 
+@interface GPUImageThreeInputFilter() {
+    CMTime _forcedTimeStamp;
+}
+
+@end
+
 @implementation GPUImageThreeInputFilter
 
-#pragma mark -
 #pragma mark Initialization and teardown
 
 - (id)initWithFragmentShaderFromString:(NSString *)fragmentShaderString;
@@ -42,6 +48,9 @@ NSString *const kGPUImageThreeInputTextureVertexShaderString = SHADER_STRING
     {
 		return nil;
     }
+    
+    _timeStampsPassedThrough = kTimeStampsUsedNormal;
+    _forcedTimeStamp = kCMTimeInvalid;
     
     inputRotation3 = kGPUImageNoRotation;
     
@@ -243,6 +252,9 @@ NSString *const kGPUImageThreeInputTextureVertexShaderString = SHADER_STRING
     
     if (textureIndex == 0)
     {
+        if (_timeStampsPassedThrough == kTimeStampsUsedFirstIndex)
+            _forcedTimeStamp = frameTime;
+            
         hasReceivedFirstFrame = YES;
         firstFrameTime = frameTime;
         if (secondFrameCheckDisabled)
@@ -264,6 +276,9 @@ NSString *const kGPUImageThreeInputTextureVertexShaderString = SHADER_STRING
     }
     else if (textureIndex == 1)
     {
+        if (_timeStampsPassedThrough == kTimeStampsUsedSecondIndex)
+            _forcedTimeStamp = frameTime;
+
         hasReceivedSecondFrame = YES;
         secondFrameTime = frameTime;
         if (firstFrameCheckDisabled)
@@ -285,6 +300,9 @@ NSString *const kGPUImageThreeInputTextureVertexShaderString = SHADER_STRING
     }
     else
     {
+        if (_timeStampsPassedThrough == kTimeStampsUsedSecondIndex)
+            _forcedTimeStamp = frameTime;
+        
         hasReceivedThirdFrame = YES;
         thirdFrameTime = frameTime;
         if (firstFrameCheckDisabled)
@@ -317,7 +335,11 @@ NSString *const kGPUImageThreeInputTextureVertexShaderString = SHADER_STRING
         
         [self renderToTextureWithVertices:imageVertices textureCoordinates:[[self class] textureCoordinatesForRotation:inputRotation]];
         
-        [self informTargetsAboutNewFrameAtTime:frameTime];
+        if (CMTIME_IS_VALID(_forcedTimeStamp)) {
+            [self informTargetsAboutNewFrameAtTime:_forcedTimeStamp];
+        } else {
+            [self informTargetsAboutNewFrameAtTime:frameTime];
+        }
 
         hasReceivedFirstFrame = NO;
         hasReceivedSecondFrame = NO;
