@@ -26,6 +26,7 @@ NSString *const kGPUImageSketchFragmentShaderString = SHADER_STRING
  
  void main()
  {
+     vec4 textureColor = texture2D(inputImageTexture, textureCoordinate);
      
      float bottomLeftIntensity = texture2D(inputImageTexture, bottomLeftTextureCoordinate).r;
      float topRightIntensity = texture2D(inputImageTexture, topRightTextureCoordinate).r;
@@ -39,8 +40,8 @@ NSString *const kGPUImageSketchFragmentShaderString = SHADER_STRING
      float v = -bottomLeftIntensity - 2.0 * leftIntensity - topLeftIntensity + bottomRightIntensity + 2.0 * rightIntensity + topRightIntensity;
      
      float mag = 1.0 - (length(vec2(h, v)) * edgeStrength);
-     
-     gl_FragColor = vec4(vec3(mag), 1.0);
+
+     gl_FragColor = vec4(vec3(mag), textureColor.a);
  }
 );
 #else

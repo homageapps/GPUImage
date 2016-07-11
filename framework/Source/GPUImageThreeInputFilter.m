@@ -30,6 +30,8 @@ NSString *const kGPUImageThreeInputTextureVertexShaderString = SHADER_STRING
 
 @implementation GPUImageThreeInputFilter
 
+@synthesize timeStampsPassedThrough = _timeStampsPassedThrough;
+
 #pragma mark Initialization and teardown
 
 - (id)initWithFragmentShaderFromString:(NSString *)fragmentShaderString;

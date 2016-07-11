@@ -16,16 +16,6 @@ extern NSString *const kGPUImageThreeInputTextureVertexShaderString;
     BOOL thirdFrameCheckDisabled;
 }
 
-// For now, just redefine this on the Mac
-typedef NS_ENUM(NSInteger, kTimeStampsUsed) {
-    kTimeStampsUsedNormal,            // default GPUImage lib behaviour. Will passthrough any received timestamp.
-    kTimeStampsUsedFirstIndex,        // Will pass through timestamps of only the first index frames.
-    kTimeStampsUsedSecondIndex,       // Will pass through timestamps of only the first index frames.
-    kTimeStampsUsedThirdIndex         // Will pass through timestamps of only the first index frames.
-};
-
-@property (nonatomic) kTimeStampsUsed timeStampsPassedThrough;
-
 - (void)disableThirdFrameCheck;
 
 @end

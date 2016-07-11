@@ -18,7 +18,15 @@ NSString *const kGPUImageTwoInputTextureVertexShaderString = SHADER_STRING
 );
 
 
+@interface GPUImageTwoInputFilter() {
+    CMTime _forcedTimeStamp;
+}
+
+@end
+
 @implementation GPUImageTwoInputFilter
+
+@synthesize timeStampsPassedThrough = _timeStampsPassedThrough;
 
 #pragma mark -
 #pragma mark Initialization and teardown
@@ -39,6 +47,9 @@ NSString *const kGPUImageTwoInputTextureVertexShaderString = SHADER_STRING
     {
 		return nil;
     }
+    
+    _timeStampsPassedThrough = kTimeStampsUsedNormal;
+    _forcedTimeStamp = kCMTimeInvalid;
     
     inputRotation2 = kGPUImageNoRotation;
     
@@ -218,6 +229,9 @@ NSString *const kGPUImageTwoInputTextureVertexShaderString = SHADER_STRING
     
     if (textureIndex == 0)
     {
+        if (_timeStampsPassedThrough == kTimeStampsUsedFirstIndex)
+            _forcedTimeStamp = frameTime;
+        
         hasReceivedFirstFrame = YES;
         firstFrameTime = frameTime;
         if (secondFrameCheckDisabled)
@@ -235,6 +249,9 @@ NSString *const kGPUImageTwoInputTextureVertexShaderString = SHADER_STRING
     }
     else
     {
+        if (_timeStampsPassedThrough == kTimeStampsUsedSecondIndex)
+            _forcedTimeStamp = frameTime;
+        
         hasReceivedSecondFrame = YES;
         secondFrameTime = frameTime;
         if (firstFrameCheckDisabled)
@@ -255,6 +272,11 @@ NSString *const kGPUImageTwoInputTextureVertexShaderString = SHADER_STRING
     if ((hasReceivedFirstFrame && hasReceivedSecondFrame) || updatedMovieFrameOppositeStillImage)
     {
         CMTime passOnFrameTime = (!CMTIME_IS_INDEFINITE(firstFrameTime)) ? firstFrameTime : secondFrameTime;
+        
+        if (CMTIME_IS_VALID(_forcedTimeStamp)) {
+            passOnFrameTime = _forcedTimeStamp;
+        }
+
         [super newFrameReadyAtTime:passOnFrameTime atIndex:0]; // Bugfix when trying to record: always use time from first input (unless indefinite, in which case use the second input)
         hasReceivedFirstFrame = NO;
         hasReceivedSecondFrame = NO;
